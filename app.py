@@ -9,6 +9,8 @@ app.config['SQLALCHEMY_DATABASE_URI']= 'mysql+mysqlconnector://root:thegoblet2@l
 db = SQLAlchemy(app)
 ma = Marshmallow(app)
 
+#-------------------------------------------------------------------------------------
+
 class Customer(db.Model):
     __tablename__ = 'Customer'
     id = db.Column(db.Integer, primary_key=True)
@@ -24,6 +26,19 @@ class CustomerSchema(ma.Schema):
 
 customer_schema = CustomerSchema()
 customers_schema = CustomerSchema(many=True)
+
+class Product(db.Model):
+    __tablename__ = 'Products'
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String (255), nullable = False)
+    price = db.Column(db.Float, nullable = False)
+
+class ProductSchema(ma.Schema):
+    name = fields.String(required=True)
+    price = fields.String(required=True)
+
+product_schema = CustomerSchema()
+products_schema = CustomerSchema(many=True)
 
 class Orders(db.Model):
     __tablename__ = 'Orders'
@@ -45,12 +60,7 @@ order_product = db.Table('Order_Product',
         db.Column('product_id', db.Integer, db.ForeignKey('Products.id'), primary_key = True))
 
 
-class Product(db.Model):
-    __tablename__ = 'Products'
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String (255), nullable = False)
-    price = db.Column(db.Float, nullable = False)
-
+#-------------------------------------------------------------------------------------
 
 @app.route('/customers', methods= ['POST'])
 def add_customer():
@@ -84,8 +94,9 @@ def delete_customer(id):
     customer = Customer.query.get_or_404(id)
     db.session.delete(customer)
     db.session.commit()
+    return jsonify({"message":"member deleted"}), 201
 
-
+#-------------------------------------------------------------------------------------
 
 if __name__ == "__main__":
     app.run(debug=True)
