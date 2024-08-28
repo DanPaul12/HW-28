@@ -15,9 +15,9 @@ class Customer(db.Model):
     name = db.Column(db.String (255), nullable = False)
     email = db.Column(db.String (320))
     phone = db.Column(db.String (15))
-    orders = db.relationship('Order', backref = 'customer')
+    orders = db.relationship('Orders', backref = 'customer')
 
-class CustomerSchema():
+class CustomerSchema(ma.Schema):
     name = fields.String(required=True)
     email = fields.String(required=True)
     phone = fields.String(required=True)
@@ -61,6 +61,7 @@ def add_customer():
     db.session.add(customer)
     db.session.commit()
     return jsonify({'message':'customer added'}), 200
+
 
 if __name__ == "__main__":
     app.run(debug=True)
