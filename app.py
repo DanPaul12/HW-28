@@ -37,8 +37,8 @@ class ProductSchema(ma.Schema):
     name = fields.String(required=True)
     price = fields.String(required=True)
 
-product_schema = CustomerSchema()
-products_schema = CustomerSchema(many=True)
+product_schema = ProductSchema()
+products_schema = ProductSchema(many=True)
 
 class Orders(db.Model):
     __tablename__ = 'Orders'
@@ -97,6 +97,15 @@ def delete_customer(id):
     return jsonify({"message":"member deleted"}), 201
 
 #-------------------------------------------------------------------------------------
+
+@app.route('/products', methods=['POST'])
+def add_product():
+    product_info =product_schema.load(request.json)
+    product = Product(name = product_info['name'], price = product_info['price'])
+    db.session.add(product)
+    db.session.commit()
+    return jsonify({'message':'product added'}), 200
+
 
 if __name__ == "__main__":
     app.run(debug=True)
