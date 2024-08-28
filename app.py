@@ -23,7 +23,7 @@ class CustomerSchema():
     phone = fields.String(required=True)
 
 customer_schema = CustomerSchema()
-custotmers_schema = CustomerSchema(many=True)
+customers_schema = CustomerSchema(many=True)
 
 class Orders(db.Model):
     __tablename__ = 'Orders'
@@ -63,6 +63,7 @@ def add_customer():
     return jsonify({'message':'customer added'}), 200
 
 if __name__ == "__main__":
+    app.run(debug=True)
     
 
     
