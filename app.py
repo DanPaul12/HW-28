@@ -63,6 +63,30 @@ def add_customer():
     return jsonify({'message':'customer added'}), 200
 
 
+@app.route('/customers<int:id>', methods= ['GET'])
+def get_customer(id):
+    customer = Customer.query.get_or_404(id)
+    return customer_schema.jsonify(customer)
+
+
+@app.route('/customers<int:id>', methods= ['PUT'])
+def update_customer(id):
+    customer = Customer.query.get_or_404(id)
+    customer_data = customer_schema.load(request.json)
+    customer.name = customer_data['name']
+    customer.email = customer_data['email']
+    customer.phone = customer_data['phone']
+    db.session.commit()
+    return jsonify({"message":"member updated"}), 201
+
+@app.route('/customers<int:id>', methods= ['DELETE'])
+def delete_customer(id):
+    customer = Customer.query.get_or_404(id)
+    db.session.delete(customer)
+    db.session.commit()
+
+
+
 if __name__ == "__main__":
     app.run(debug=True)
     
