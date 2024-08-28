@@ -106,6 +106,27 @@ def add_product():
     db.session.commit()
     return jsonify({'message':'product added'}), 200
 
+@app.route('/products<int:id>', methods=['GET'])
+def get_product(id):
+    product = Product.query.get_or_404(id)
+    return product_schema.jsonify(product)
+
+@app.route('/products<int:id>', methods=['PUT'])
+def update_product(id):
+    product_info = Product.query.get_or_404(id)
+    new_info = product_schema.load(request.json)
+    new_info.name = product_info['name']
+    new_info.price = product_info['price']
+    db.session.commit()
+    return jsonify({'message':'member updated'}), 201
+
+@app.route('/products<int:id>', methods= ['DELETE'])
+def delete_customer(id):
+    product = Product.query.get_or_404(id)
+    db.session.delete(product)
+    db.session.commit()
+    return jsonify({"message":"product deleted"}), 201
+
 
 if __name__ == "__main__":
     app.run(debug=True)
