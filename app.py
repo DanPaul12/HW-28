@@ -1,6 +1,8 @@
-from flask import Flask, json, request
+from flask import Flask, jsonify, request
 from flask_sqlalchemy import SQLAlchemy
 from flask_marshmallow import Marshmallow
+from marshmallow import fields, validate
+from marshmallow import ValidationError
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI']= 'mysql+mysqlconnector://root:thegoblet2@localhost/e_commerce_db'
@@ -15,8 +17,13 @@ class Customer(db.Model):
     phone = db.Column(db.String (15))
     orders = db.relationship('Order', backref = 'customer')
 
-customer_schema = Customer()
-custotmers_schema = Customer(many=True)
+class CustomerSchema():
+    name = fields.String(required=True)
+    email = fields.String(required=True)
+    phone = fields.String(required=True)
+
+customer_schema = CustomerSchema()
+custotmers_schema = CustomerSchema(many=True)
 
 class Orders(db.Model):
     __tablename__ = 'Orders'
@@ -54,5 +61,8 @@ def add_customer():
     db.session.add(customer)
     db.session.commit()
     return jsonify({'message':'customer added'}), 200
+
+if __name__ == "__main__":
+    
 
     
