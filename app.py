@@ -48,7 +48,7 @@ class Orders(db.Model):
 
 class OrdersSchema(ma.Schema):
     date = fields.String(required=True)
-    customer_id = fields.Integer(required=True)
+    customer_id = fields.Integer()
 
 order_schema = OrdersSchema()
 orders_schema = OrdersSchema(many=True)
@@ -61,6 +61,13 @@ class CustomerAcccount(db.Model):
     customer_id = db.Column(db.Integer, db.ForeignKey("Customer.id"))
     customer = db.relationship('Customer', backref = 'customer_account', uselist=False)
 
+class CustomerAccountSchema(ma.Schema):
+    username = fields.String(required=True)
+    password = fields.String(required=True)
+    customer_id = fields.String()
+
+c_account_schema = CustomerAccountSchema()
+c_accounts_schema = CustomerAccountSchema(many=True)
 
 order_product = db.Table('Order_Product',
         db.Column('order_id', db.Integer, db.ForeignKey('Orders.id'), primary_key = True),
@@ -125,7 +132,7 @@ def update_product(id):
     product_info.name = new_info['name']
     product_info.price = new_info['price']
     db.session.commit()
-    return jsonify({'message':'member updated'}), 201
+    return jsonify({'message':'product updated'}), 201
 
 @app.route('/products<int:id>', methods= ['DELETE'])
 def delete_product(id):
@@ -148,6 +155,46 @@ def add_order():
 def get_order(id):
     order = Orders.query.get_or_404(id)
     return order_schema.jsonify(order)
+
+@app.route('/orders<int:id>', methods=['PUT'])
+def update_order(id):
+    order_info = Orders.query.get_or_404(id)
+    new_info = order_schema.load(request.json)
+    order_info.date = new_info['date']
+    db.session.commit()
+    return jsonify({'message':'order updated'}), 201
+
+@app.route('/orders<int:id>', methods= ['DELETE'])
+def delete_order(id):
+    order = Orders.query.get_or_404(id)
+    db.session.delete(order)
+    db.session.commit()
+    return jsonify({"message":"order deleted"}), 201
+
+#-------------------------------------------------------------------------------------
+
+@app.route('/accounts', methods=['POST'])
+def add_account():
+    account_info =c_account_schema.load(request.json)
+    account = CustomerAcccount(username = account_info['username'], password = account_info['password'], customer_id = account_info['customer_id'])
+    db.session.add(account)
+    db.session.commit()
+    return jsonify({'message':'account added'}), 200
+
+@app.route('/accounts<int:id>', methods=['GET'])
+def get_account(id):
+    account = CustomerAcccount.query.get_or_404(id)
+    return order_schema.jsonify(account)
+
+@app.route('/accounts<int:id>', methods=['PUT'])
+def update_account(id):
+    account_info = CustomerAcccount.query.get_or_404(id)
+    new_info = c_account_schema.load(request.json)
+    account_info.username = new_info['username']
+    account_info.password = new_info['password']
+    db.session.commit()
+    return jsonify({'message':'order updated'}), 201
+
 
 
 if __name__ == "__main__":
