@@ -184,7 +184,7 @@ def add_account():
 @app.route('/accounts<int:id>', methods=['GET'])
 def get_account(id):
     account = CustomerAcccount.query.get_or_404(id)
-    return order_schema.jsonify(account)
+    return c_account_schema.jsonify(account)
 
 @app.route('/accounts<int:id>', methods=['PUT'])
 def update_account(id):
@@ -193,9 +193,14 @@ def update_account(id):
     account_info.username = new_info['username']
     account_info.password = new_info['password']
     db.session.commit()
-    return jsonify({'message':'order updated'}), 201
+    return jsonify({'message':'account updated'}), 201
 
-
+@app.route('/accounts<int:id>', methods= ['DELETE'])
+def delete_account(id):
+    account = CustomerAcccount.query.get_or_404(id)
+    db.session.delete(account)
+    db.session.commit()
+    return jsonify({"message":"account deleted"}), 201
 
 if __name__ == "__main__":
     app.run(debug=True)
