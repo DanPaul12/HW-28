@@ -137,12 +137,17 @@ def delete_product(id):
 #-------------------------------------------------------------------------------------
 
 @app.route('/orders', methods=['POST'])
-def add_product():
+def add_order():
     order_info =order_schema.load(request.json)
-    order = Product(date = order_info['date'], customer_id = order_info['customer_id'])
+    order = Orders(date = order_info['date'], customer_id = order_info['customer_id'])
     db.session.add(order)
     db.session.commit()
-    return jsonify({'message':'product added'}), 200
+    return jsonify({'message':'order added'}), 200
+
+@app.route('/orders<int:id>', methods=['GET'])
+def get_order(id):
+    order = Orders.query.get_or_404(id)
+    return order_schema.jsonify(order)
 
 
 if __name__ == "__main__":
