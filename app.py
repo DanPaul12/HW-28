@@ -46,6 +46,13 @@ class Orders(db.Model):
     date = db.Column(db.Date, nullable = False)
     customer_id = db.Column(db.Integer, db.ForeignKey("Customer.id"))
 
+class OrdersSchema(ma.Schema):
+    date = fields.String(required=True)
+    customer_id = fields.Integer(required=True)
+
+order_schema = OrdersSchema()
+orders_schema = OrdersSchema(many=True)
+
 class CustomerAcccount(db.Model):
     __tablename__ = 'CustomerAccount'
     id = db.Column(db.Integer, primary_key=True)
@@ -115,17 +122,27 @@ def get_product(id):
 def update_product(id):
     product_info = Product.query.get_or_404(id)
     new_info = product_schema.load(request.json)
-    new_info.name = product_info['name']
-    new_info.price = product_info['price']
+    product_info.name = new_info['name']
+    product_info.price = new_info['price']
     db.session.commit()
     return jsonify({'message':'member updated'}), 201
 
 @app.route('/products<int:id>', methods= ['DELETE'])
-def delete_customer(id):
+def delete_product(id):
     product = Product.query.get_or_404(id)
     db.session.delete(product)
     db.session.commit()
     return jsonify({"message":"product deleted"}), 201
+
+#-------------------------------------------------------------------------------------
+
+@app.route('/orders', methods=['POST'])
+def add_product():
+    order_info =order_schema.load(request.json)
+    order = Product(date = order_info['date'], customer_id = order_info['customer_id'])
+    db.session.add(order)
+    db.session.commit()
+    return jsonify({'message':'product added'}), 200
 
 
 if __name__ == "__main__":
